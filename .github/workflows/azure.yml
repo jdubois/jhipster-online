@@ -9,6 +9,8 @@ name: Azure
 ###
 
 on:
+  schedule:
+    - cron: "0 * * * *"
   push:
     branches:
       - 'main'
@@ -21,6 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          repository: 'jhipster/jhipster-online'
           submodules: 'true'
       - name: Build a Docker image
         id: build
