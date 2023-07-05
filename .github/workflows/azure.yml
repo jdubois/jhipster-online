@@ -24,7 +24,7 @@ jobs:
           submodules: 'true'
       - name: Build a Docker image
         id: build
-        run: 'docker build . -t ${{ env.IMAGE_NAME }}'
+        run: 'docker build . -t ${{ secrets.CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}'
         shell: bash
       - name: Login to Azure
         uses: azure/login@v1
