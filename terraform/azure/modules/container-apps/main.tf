@@ -113,6 +113,26 @@ resource "azurerm_container_app" "application" {
         name        = "DATABASE_PASSWORD"
         secret_name = "database-password"
       }
+      env {
+          name  = "MAIL_HOST"
+          value = "smtp.mailgun.org"
+      }
+      env {
+          name  = "MAIL_PORT"
+          value = "2525"
+      }
+      env {
+          name        = "MAIL_USERNAME"
+          secret_name = "jhipster@jhipster.tech"
+      }
+      env {
+          name        = "MAIL_PASSWORD"
+          secret_name = "XXXXX"
+      }
+      env {
+          name        = "PORT"
+          secret_name = "8080"
+      }
     }
     min_replicas = 1
   }

@@ -31,6 +31,7 @@ resource "azurerm_mysql_flexible_server" "database" {
   version                      = "8.0.21"
   backup_retention_days        = 7
   geo_redundant_backup_enabled = false
+  zone = "3"
 
   tags = {
     "environment"      = var.environment
@@ -42,8 +43,8 @@ resource "azurerm_mysql_flexible_database" "database" {
   name                = var.database_name
   resource_group_name = var.resource_group
   server_name         = azurerm_mysql_flexible_server.database.name
-  charset             = "utf8"
-  collation           = "utf8_unicode_ci"
+  charset             = "utf8mb3"
+  collation           = "utf8mb3_unicode_ci"
 }
 
 resource "azurecaf_name" "mysql_firewall_rule" {
