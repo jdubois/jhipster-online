@@ -1,0 +1,46 @@
+name: Azure
+
+###
+# Automatically build and deploy the application to Azure Container Apps
+#
+# Secrets to configire:
+# - AZURE_CREDENTIALS: Azure service principal credentials
+# - CONTAINER_REGISTRY_NAME: Azure Container Registry name
+###
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    env:
+        IMAGE_NAME: jhipster/jhipster-online:latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Build a Docker image
+        id: build
+        run: 'docker build . -t ${{ env.IMAGE_NAME }}
+        shell: bash
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Push to Azure Container Registry
+        run: |
+          az acr login -n ${{ secrets.CONTAINER_REGISTRY_NAME }}.azurecr.io
+          docker push ${{ env.IMAGE_NAME }}
+        shell: bash
+      - name: Deploy to Container App
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az config set extension.use_dynamic_install=yes_without_prompt
+            az containerapp update \
+              -n ca-jhipster-online-dev \
+              -g rg-jhipster-online-dev \
+              --image ${{ secrets.CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}
