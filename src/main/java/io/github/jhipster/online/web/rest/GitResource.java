@@ -36,6 +36,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -109,42 +111,42 @@ public class GitResource {
      */
     @PostMapping("/{gitProvider}/save-token")
     @Secured(AuthoritiesConstants.USER)
-    public @ResponseBody ResponseEntity<String> saveToken(@PathVariable String gitProvider, @RequestBody String code) {
+    public @ResponseBody ResponseEntity<String> saveToken(@PathVariable String gitProvider, @RequestBody String code)
+        throws InterruptedException {
         try {
             String url;
             GitProvider gitProviderEnum;
-            GitAccessTokenRequest request = new GitAccessTokenRequest();
+            Map<String, String> params = new HashMap<>();
             switch (gitProvider.toLowerCase()) {
                 case GITHUB:
                     url = applicationProperties.getGithub().getHost() + "/login/oauth/access_token";
                     gitProviderEnum = GitProvider.GITHUB;
-                    request.setClient_id(applicationProperties.getGithub().getClientId());
-                    request.setClient_secret(applicationProperties.getGithub().getClientSecret());
-                    request.setCode(code);
+                    params.put("client_id", applicationProperties.getGithub().getClientId());
+                    params.put("client_secret", applicationProperties.getGithub().getClientSecret());
+                    params.put("code", code);
                     break;
                 case GITLAB:
                     url = applicationProperties.getGitlab().getHost() + "/oauth/token";
                     gitProviderEnum = GitProvider.GITLAB;
-                    request.setClient_id(applicationProperties.getGitlab().getClientId());
-                    request.setClient_secret(applicationProperties.getGitlab().getClientSecret());
-                    request.setGrant_type("authorization_code");
-                    request.setRedirect_uri(applicationProperties.getGitlab().getRedirectUri());
-                    request.setCode(code);
+                    params.put("client_id", applicationProperties.getGitlab().getClientId());
+                    params.put("client_secret", applicationProperties.getGitlab().getClientSecret());
+                    params.put("code", code);
+                    params.put("grant_type", "authorization_code");
+                    params.put("redirect_uri", applicationProperties.getGitlab().getRedirectUri());
                     break;
                 default:
                     return new ResponseEntity<>(UNKNOWN_GIT_PROVIDER + gitProvider, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             ObjectMapper objectMapper = new ObjectMapper();
-            String requestBody = objectMapper.writeValueAsString(request);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest httpRequest = HttpRequest
                 .newBuilder()
                 .uri(URI.create(url))
-                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .header("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .header("Accept", MediaType.APPLICATION_JSON_VALUE)
                 .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:72.0) Gecko/20100101 Firefox/72.0")
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .POST(HttpRequest.BodyPublishers.ofString(buildQueryString(params)))
                 .build();
 
             CompletableFuture<HttpResponse<String>> response = client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -152,6 +154,10 @@ public class GitResource {
             String jsonResponse = response.thenApply(HttpResponse::body).get(5, TimeUnit.SECONDS);
             GitAccessTokenResponse accessTokenResponse = objectMapper.readValue(jsonResponse, GitAccessTokenResponse.class);
             this.userService.saveToken(accessTokenResponse.getAccess_token(), gitProviderEnum);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted!", e);
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             log.error("OAuth2 token could not saved: ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -159,11 +165,24 @@ public class GitResource {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    private static String buildQueryString(Map<String, String> params) {
+        StringBuilder queryString = new StringBuilder();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (queryString.length() > 0) {
+                queryString.append("&");
+            }
+            queryString.append(entry.getKey());
+            queryString.append("=");
+            queryString.append(entry.getValue());
+        }
+        return queryString.toString();
+    }
+
     public static class GitAccessTokenRequest {
 
-        private String client_id;
+        private String clientId;
 
-        private String client_secret;
+        private String clientSecret;
 
         private String code;
 
@@ -171,20 +190,20 @@ public class GitResource {
 
         private String redirectUri;
 
-        public String getClient_id() {
-            return client_id;
+        public String getClientId() {
+            return clientId;
         }
 
-        public void setClient_id(String client_id) {
-            this.client_id = client_id;
+        public void setClientId(String clientId) {
+            this.clientId = clientId;
         }
 
-        public String getClient_secret() {
-            return client_secret;
+        public String getClientSecret() {
+            return clientSecret;
         }
 
-        public void setClient_secret(String client_secret) {
-            this.client_secret = client_secret;
+        public void setClientSecret(String clientSecret) {
+            this.clientSecret = clientSecret;
         }
 
         public String getCode() {
@@ -195,19 +214,19 @@ public class GitResource {
             this.code = code;
         }
 
-        public String getGrant_type() {
+        public String getGrantType() {
             return grantType;
         }
 
-        public void setGrant_type(String grantType) {
+        public void setGrantType(String grantType) {
             this.grantType = grantType;
         }
 
-        public String getRedirect_uri() {
+        public String getRedirectUri() {
             return redirectUri;
         }
 
-        public void setRedirect_uri(String redirectUri) {
+        public void setRedirectUri(String redirectUri) {
             this.redirectUri = redirectUri;
         }
 
@@ -216,10 +235,10 @@ public class GitResource {
             return (
                 "GitAccessTokenRequest{" +
                 "client_id='" +
-                client_id +
+                clientId +
                 '\'' +
                 ", client_secret='" +
-                client_secret +
+                clientSecret +
                 '\'' +
                 ", code='" +
                 code +
