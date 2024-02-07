@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2023 the original author or authors from the JHipster project.
+ * Copyright 2017-2024 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster Online project, see https://github.com/jhipster/jhipster-online
  * for more information.
@@ -23,7 +23,6 @@ import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/user/account.model';
 import { GitConfigurationService } from 'app/core/git/git-configuration.service';
 import { GitConfigurationModel } from 'app/core/git/git-configuration.model';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'jhi-home',

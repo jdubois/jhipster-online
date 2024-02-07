@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2023 the original author or authors from the JHipster project.
+ * Copyright 2017-2024 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster Online project, see https://github.com/jhipster/jhipster-online
  * for more information.
@@ -67,9 +67,7 @@ export class DeleteJdlStudioComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    unsubscribe(this.subscription);
   }
 }
 
@@ -164,12 +162,16 @@ export class ApplyJdlStudioComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    unsubscribe(this.subscription);
   }
 
   isAtLeastOneGitProviderAvailableAndConfigured(): boolean {
     return (this.gitConfig.githubAvailable && this.githubConfigured) || (this.gitConfig.gitlabAvailable && this.gitlabConfigured) || false;
   }
 }
+
+const unsubscribe = (subscription: Subscription | undefined) => {
+  if (subscription) {
+    subscription.unsubscribe();
+  }
+};

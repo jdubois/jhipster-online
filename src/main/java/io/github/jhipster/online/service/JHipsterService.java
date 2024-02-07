@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2023 the original author or authors from the JHipster project.
+ * Copyright 2017-2024 the original author or authors from the JHipster project.
  * <p>
  * This file is part of the JHipster Online project, see https://github.com/jhipster/jhipster-online
  * for more information.
@@ -42,6 +42,8 @@ public class JHipsterService {
 
     private static final String SKIP_INSTALL = "--skip-install";
 
+    private static final String FORCE = "--force";
+
     private final LogsService logsService;
 
     private final Executor taskExecutor;
@@ -79,7 +81,7 @@ public class JHipsterService {
                 SKIP_INSTALL,
                 "--skip-cache",
                 "--skip-git",
-                "--force"
+                FORCE
             );
     }
 
@@ -94,7 +96,7 @@ public class JHipsterService {
                 FORCE_INSIGHT,
                 SKIP_CHECKS,
                 SKIP_INSTALL,
-                "--force"
+                FORCE
             );
     }
 
@@ -113,7 +115,7 @@ public class JHipsterService {
                 FORCE_INSIGHT,
                 SKIP_CHECKS,
                 SKIP_INSTALL,
-                "--force"
+                FORCE
             );
     }
 

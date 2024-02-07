@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2023 the original author or authors from the JHipster project.
+ * Copyright 2017-2024 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster Online project, see https://github.com/jhipster/jhipster-online
  * for more information.
@@ -40,7 +40,7 @@ import { fontAwesomeIcons } from './icons/font-awesome-icons';
 @NgModule({
   imports: [
     HttpClientModule,
-    CookieModule.forRoot(),
+    CookieModule.withOptions(),
     NgxWebstorageModule.forRoot({ prefix: 'jhi', separator: '-' }),
     NgJhipsterModule.forRoot({
       // set below to true to make alerts look like toast
