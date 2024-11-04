@@ -18,7 +18,7 @@ spring:
     name: jhonline
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:tc:mysql:8://localhost/jhipster-online?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    url: jdbc:tc:mysql:8:///jhipster-online?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
     username: test
     password: test
     hikari:
