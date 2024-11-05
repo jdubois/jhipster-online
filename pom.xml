@@ -105,7 +105,7 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
-                <version>1.17.3</version>
+                <version>1.20.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -703,7 +703,7 @@
                             </requireMavenVersion>
                             <requireJavaVersion>
                                 <message>You are running an incompatible version of Java. JHipster supports JDK 8 to 13.</message>
-                                <version>[1.8,21)</version>
+                                <version>[1.8,24)</version>
                             </requireJavaVersion>
                         </rules>
                     </configuration>
